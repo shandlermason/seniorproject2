@@ -38,36 +38,33 @@ def twin_model(soc, bm, deploy):
     twin_soc = 0
     twin_bm = 0
     twin_deploy = 0
-    index = 67
+    index = 0
     list_delta_soc = []
 
-    while True:
+    while index <= len(soc)-1:
+        '''
         # test to check values in variables
-        print(soc[index])
-        print(twin_soc)
-        
+        num1 = soc[index]
+        num2 = twin_soc
+        '''
         delta_soc = soc[index] - twin_soc
-        if delta_soc > 0.001:
+        if abs(delta_soc) > 0.001:
             twin_soc = soc[index]
             list_delta_soc.append(delta_soc)
-            # test to check delta values and if list is appending delta values
-            print('deltas one by one', list_delta_soc)
         index += 1
 
-        if index == (len(soc) - 1):
-            False
-
     # test to make sure delta values are calculating and appending to list
+    # Need to figure out how to disregard first delta because it is skewed (100 - 0 = 100 for delta)
     print('list of deltas: ', list_delta_soc)
 
 
 b_state_of_charge, pg_body_mounted, pg_deploy = retrieve_data()
-
+'''
 # tests to make sure the data is being retrieved and put into list
 print('batter soc list: ', b_state_of_charge)
 print('power generated body mounted list: ', pg_body_mounted)
 print('power generated deploy list: ', pg_deploy)
-
+'''
 twin_model(b_state_of_charge, pg_body_mounted, pg_deploy)
 
 '''
