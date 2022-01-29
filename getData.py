@@ -34,19 +34,20 @@ def retrieve_data():
         print('batter state of charge list # 1: ', battery_soc_list)
         return battery_soc_list, pg_body_mounted_list, pg_deployed
 
+
 def twin_model(soc, bm, deploy):
     twin_soc = 0
     twin_bm = 0
     twin_deploy = 0
-    index = 0
+    index = 400
+    # What is the purpose of the list of deltas
     list_delta_soc = []
 
     while index <= len(soc)-1:
-        '''
         # test to check values in variables
         num1 = soc[index]
         num2 = twin_soc
-        '''
+
         delta_soc = soc[index] - twin_soc
         if abs(delta_soc) > 0.001:
             twin_soc = soc[index]
