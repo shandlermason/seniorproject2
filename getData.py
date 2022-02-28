@@ -25,16 +25,30 @@ def retrieve_data(token, org, bucket):
                     list_of_values.append(field_name)
         return list_of_values
 
+
 data_set_1 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kKETqnt0Cjmprzl9-VT5EtXjAr8e3Ce3w78w==", "NCAT Senior Project 2", "SP2")
 
-data_set_2 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kKETqnt0Cjmprzl9-VT5EtXjAr8e3Ce3w78w==", "NCAT Senior Project 2", "SP2")
+data_set_2 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kKETqnt0Cjmprzl9-VT5EtXjAr8e3Ce3w78w==", "NCAT Senior Project 2", "SP2_2")
 
 
+def compare_data(data1, data2):
+    list_values1 = []
+    list_values2 = []
+    deltas = []
 
+    for x in data1:
+        value1 = x.index(1)
+        list_values1.append(value1)
+    for y in data2:
+        value2 = y.index(1)
+        list_values2.append(value2)
 
+    zip_object = zip(list_values1, list_values2)
+    for list1_v, list2_v in zip_object:
+        deltas.append(list1_v - list2_v)
+    return deltas
 
-
-
+compare_data(data_set_1, data_set_2)
 
 
 #functionally be able to grab from one data set and compare to another data set
