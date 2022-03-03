@@ -1,6 +1,6 @@
 from influxdb_client import InfluxDBClient
 
-def retrieve_data(token, org, bucket):
+def retrieve_data(token, org, bucket, query):
     # Generated API token, org and bucket - ask Shandler for InfluxDB username and password
 
     # run InfluxDB on local host
@@ -8,9 +8,7 @@ def retrieve_data(token, org, bucket):
         query_api = client.query_api()
 
         # Search for data within SP2 bucket
-        query = 'from(bucket: "SP2") \
-        |> range(start: -10y) \
-        |> filter(fn:(r) => r._measurement == "power")'
+
         result = query_api.query(org=org, query=query)
 
         # List of each field and its value
@@ -25,29 +23,38 @@ def retrieve_data(token, org, bucket):
                     list_of_values.append(field_name)
         return list_of_values
 
-
-data_set_1 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kKETqnt0Cjmprzl9-VT5EtXjAr8e3Ce3w78w==", "NCAT Senior Project 2", "SP2")
-
-data_set_2 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kKETqnt0Cjmprzl9-VT5EtXjAr8e3Ce3w78w==", "NCAT Senior Project 2", "SP2_2")
-
-
+# currently comparing numbers of the same timestamp
 def compare_data(data1, data2):
     list_values1 = []
     list_values2 = []
+    # list for storing the intensity of the deltas
     deltas = []
 
+    # extracts the value (2nd element) from the tuple and stores it in list
     for x in data1:
-        value1 = x.index(1)
+        value1 = x[1]
         list_values1.append(value1)
     for y in data2:
-        value2 = y.index(1)
+        value2 = y[1]
         list_values2.append(value2)
 
+    # finds and stores just deltas in list
     zip_object = zip(list_values1, list_values2)
     for list1_v, list2_v in zip_object:
         deltas.append(list1_v - list2_v)
     return deltas
 
+# Make sure to change query to actual bucket name in InfluxDB
+
+
+data_set_1 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kKETqnt0Cjmprzl9-VT5EtXjAr8e3Ce3w78w==", "NCAT Senior Project 2", "SP2",
+        query = 'from(bucket: "SP2") \
+        |> range(start: -10y) \
+        |> filter(fn:(r) => r._measurement == "power")')
+data_set_2 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kKETqnt0Cjmprzl9-VT5EtXjAr8e3Ce3w78w==", "NCAT Senior Project 2", "SP2_2",
+        query = 'from(bucket: "SP2_2") \
+        |> range(start: -10y) \
+        |> filter(fn:(r) => r._measurement == "power")')
 compare_data(data_set_1, data_set_2)
 
 
