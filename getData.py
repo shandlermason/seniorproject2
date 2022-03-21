@@ -1,5 +1,6 @@
 from influxdb_client import InfluxDBClient
 
+
 def retrieve_data(token, org, bucket, query):
     # Generated API token, org and bucket - ask Shandler for InfluxDB username and password
 
@@ -18,23 +19,24 @@ def retrieve_data(token, org, bucket, query):
             for record in table.records:
                 # flexible, assuming we don't know parameters
                 if record.get_field() != '':
-                    field_name = (record.get_field(), record.get_value())
-                    # add tuple to running list of values
-                    list_of_values.append(field_name)
+                    values = [record.get_field(), record.get_value(), record.get_time()]
+                    # add list to running list of values
+                    list_of_values.append(values)
         return list_of_values
 
-# currently comparing numbers of the same timestamp
-def compare_data(data1, data2):
+
+# currently, comparing numbers of the same timestamp
+def compare_data(r_data_c_v, s_data_power):
     list_values1 = []
     list_values2 = []
     # list for storing the intensity of the deltas
     deltas = []
 
     # extracts the value (2nd element) from the tuple and stores it in list
-    for x in data1:
+    for x in r_data_c_v:
         value1 = x[1]
         list_values1.append(value1)
-    for y in data2:
+    for y in s_data_power:
         value2 = y[1]
         list_values2.append(value2)
 
@@ -48,14 +50,20 @@ def compare_data(data1, data2):
 
 
 data_set_1 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kKETqnt0Cjmprzl9-VT5EtXjAr8e3Ce3w78w==", "NCAT Senior Project 2", "SP2",
-        query = 'from(bucket: "SP2") \
+        query = 'from(bucket: "Real_Telemetry_c_v") \
         |> range(start: -10y) \
-        |> filter(fn:(r) => r._measurement == "power")')
+        |> filter(fn:(r) => r._measurement == "power_real")')
 data_set_2 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kKETqnt0Cjmprzl9-VT5EtXjAr8e3Ce3w78w==", "NCAT Senior Project 2", "SP2_2",
-        query = 'from(bucket: "SP2_2") \
+        query = 'from(bucket: "Simulated_Telemetry_p") \
         |> range(start: -10y) \
         |> filter(fn:(r) => r._measurement == "power")')
 compare_data(data_set_1, data_set_2)
+
+
+
+
+
+
 
 
 #functionally be able to grab from one data set and compare to another data set
