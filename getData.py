@@ -7,11 +7,8 @@ def retrieve_data(token, org, bucket, query):
     # run InfluxDB on local host
     with InfluxDBClient(url="http://localhost:8086", token=token, org=org) as client:
         query_api = client.query_api()
-
         # Search for data within SP2 bucket
-
         result = query_api.query(org=org, query=query)
-
         # List of each field and its value
         list_of_values = []
 
@@ -27,15 +24,30 @@ def retrieve_data(token, org, bucket, query):
 
 # currently, comparing numbers of the same timestamp
 def compare_data(r_data_c_v, s_data_power):
-    list_values1 = []
+    # empty dictionary
+    freq = {}
+    # iterates through real telemetry current and voltage
+    for element in r_data_c_v:
+        # appends the field and value into its own list, will be rewritten every iteration
+        field_and_value = [element[0]]
+        field_and_value.append(element[1])
+        '''Updates the dictionary making the time the key value and the field/value list the value. The purpose of 
+        the dictionary is to sort the field/value by there times. Sorting by the time will allows us to sum the 
+        current values and voltage values of all 8 solar panels on 1 satellite.'''
+        freq.update({element[2]: field_and_value})
+
+    '''list_values1 = []
     list_values2 = []
     # list for storing the intensity of the deltas
     deltas = []
 
+
     # extracts the value (2nd element) from the tuple and stores it in list
     for x in r_data_c_v:
+        if(x[3])
         value1 = x[1]
         list_values1.append(value1)
+    
     for y in s_data_power:
         value2 = y[1]
         list_values2.append(value2)
@@ -44,7 +56,8 @@ def compare_data(r_data_c_v, s_data_power):
     zip_object = zip(list_values1, list_values2)
     for list1_v, list2_v in zip_object:
         deltas.append(list1_v - list2_v)
-    return deltas
+    '''
+    return 0
 
 # Make sure to change query to actual bucket name in InfluxDB
 
