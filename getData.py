@@ -24,17 +24,38 @@ def retrieve_data(token, org, bucket, query):
 
 # currently, comparing numbers of the same timestamp
 def compare_data(r_data_c_v, s_data_power):
-    # empty dictionary
+  # empty dictionary
     freq = {}
     # iterates through real telemetry current and voltage
     for element in r_data_c_v:
-        # appends the field and value into its own list, will be rewritten every iteration
-        field_and_value = [element[0]]
-        field_and_value.append(element[1])
-        '''Updates the dictionary making the time the key value and the field/value list the value. The purpose of 
-        the dictionary is to sort the field/value by there times. Sorting by the time will allows us to sum the 
-        current values and voltage values of all 8 solar panels on 1 satellite.'''
-        freq.update({element[2]: field_and_value})
+        '''Sets the default of the dictionary making the time the key value and the field/value the value. 
+        .setdefault() allows for multiple values to have the same key. The purpose of the dictionary is to sort 
+        the field/value by there times. Sorting by the time will allows us to sum the current values and 
+        voltage values of all 8 solar panels on 1 satellite.'''
+        freq.setdefault(element[2], []).append(element[0:2])
+
+    print(freq)
+
+    current = {}
+    voltage = {}
+    for key in freq.items():
+        count = 0
+        current_list = []
+        voltage_list = []
+        for values in freq.values():
+            if "_C" in values[count][0]:
+                # this works knowing there are 8 solar panels collecting data for the satellite
+                current_list.append(values[count][1])
+            elif "_V" in values[count][0]:
+                k = values[count][0]
+                # this works knowing there are 8 solar panels collecting data for the satellite
+                voltage_list.append(values[count][1])
+            count += 1
+            if count == 16:
+                current = {key: (sum(current_list)/8)}
+                voltage = {key: (sum(voltage_list)/8)}
+
+
 
     '''list_values1 = []
     list_values2 = []
