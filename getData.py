@@ -19,7 +19,8 @@ def retrieve_data(token, org, bucket, query):
                     values = [record.get_field(), record.get_value(), record.get_time()]
                     # add list to running list of values
                     list_of_values.append(values)
-                    unit = record.get_unit()
+                    # collecting all the units
+                    unit = record.getUnits() # possibly update unit in powerpoint to _unit so we can pull units of measurement to implement in gui (possible drop down with all units of measurement and +, -, *, / to allow for external ingested equation
                     list_of_units.append(unit)
         return list_of_values
 
