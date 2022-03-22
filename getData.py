@@ -3,7 +3,6 @@ from influxdb_client import InfluxDBClient
 
 def retrieve_data(token, org, bucket, query):
     # Generated API token, org and bucket - ask Shandler for InfluxDB username and password
-
     # run InfluxDB on local host
     with InfluxDBClient(url="http://localhost:8086", token=token, org=org) as client:
         query_api = client.query_api()
@@ -11,6 +10,7 @@ def retrieve_data(token, org, bucket, query):
         result = query_api.query(org=org, query=query)
         # List of each field and its value
         list_of_values = []
+        list_of_units = []
 
         for table in result:
             for record in table.records:
@@ -19,41 +19,57 @@ def retrieve_data(token, org, bucket, query):
                     values = [record.get_field(), record.get_value(), record.get_time()]
                     # add list to running list of values
                     list_of_values.append(values)
+                    unit = record.get_unit()
+                    list_of_units.append(unit)
         return list_of_values
 
 
 # currently, comparing numbers of the same timestamp
 def compare_data(r_data_c_v, s_data_power):
-  # empty dictionary
-    freq = {}
+    list_of_currents = []
+    list_of_voltage = []
+    count = 0
+    while count < len(r_data_c_v):
+        if "_C" in r_data_c_v[count][0]:
+            list_of_currents.append(r_data_c_v[count])
+        else:
+            list_of_voltage.append(r_data_c_v[count])
+        count += 1
+
+    # empty dictionaries
+    freq_c = {}
+    freq_v = {}
     # iterates through real telemetry current and voltage
-    for element in r_data_c_v:
+    for element in list_of_currents:
         '''Sets the default of the dictionary making the time the key value and the field/value the value. 
         .setdefault() allows for multiple values to have the same key. The purpose of the dictionary is to sort 
-        the field/value by there times. Sorting by the time will allows us to sum the current values and 
-        voltage values of all 8 solar panels on 1 satellite.'''
-        freq.setdefault(element[2], []).append(element[0:2])
+        the field/value by there times. Sorting by the time will allows us to sum the current values 
+        of all 8 solar panels on 1 satellite.'''
+        freq_c.setdefault((element[2].strftime("%m/%d/%Y, %H:%M:%S")), []).append(element[1])
+    for element in list_of_voltage:
+        '''Sets the default of the dictionary making the time the key value and the field/value the value. 
+        .setdefault() allows for multiple values to have the same key. The purpose of the dictionary is to sort 
+        the field/value by there times. Sorting by the time will allows us to sum the current values 
+        of all 8 solar panels on 1 satellite.'''
+        freq_v.setdefault((element[2].strftime("%m/%d/%Y, %H:%M:%S")), []).append(element[1])
 
-    print(freq)
+    # sum the current values of solar panels 1-8 with the same keys (the same times)
+    temp = list(freq_c)
+    test_key = temp[0]
+    for key, values in freq_c.items():
+        # updates the dictionary to have the current of the satellite (all 8 solar panels) at a specific time
+        freq_c[key] = sum(values)
+        # goes to the next key in the dictionary
+        temp[temp.index(test_key) + 1]
 
-    current = {}
-    voltage = {}
-    for key in freq.items():
-        count = 0
-        current_list = []
-        voltage_list = []
-        for values in freq.values():
-            if "_C" in values[count][0]:
-                # this works knowing there are 8 solar panels collecting data for the satellite
-                current_list.append(values[count][1])
-            elif "_V" in values[count][0]:
-                k = values[count][0]
-                # this works knowing there are 8 solar panels collecting data for the satellite
-                voltage_list.append(values[count][1])
-            count += 1
-            if count == 16:
-                current = {key: (sum(current_list)/8)}
-                voltage = {key: (sum(voltage_list)/8)}
+    # sum the voltage values of solar panels 1-8 with the same keys (the same times)
+    temp = list(freq_v)
+    test_key = temp[0]
+    for key, values in freq_v.items():
+        # updates the dictionary to have the voltage of the satellite (all 8 solar panels) at a specific time
+        freq_v[key] = sum(values)
+        # goes to the next key in the dictionary
+        temp[temp.index(test_key) + 1]
 
 
 
