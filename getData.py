@@ -19,16 +19,11 @@ def retrieve_data(token, org, bucket, query):
                     values = [record.get_field(), record.get_value(), record.get_time()]
                     # add list to running list of values
                     list_of_values.append(values)
-                    '''
-                    # collecting all the units
-                    unit = record.getUnits() # possibly update unit in powerpoint to _unit so we can pull units of measurement to implement in gui (possible drop down with all units of measurement and +, -, *, / to allow for external ingested equation
-                    list_of_units.append(unit)
-                    '''
         return list_of_values
 
 
-# currently, comparing numbers of the same timestamp
-def compare_data(r_data_c_v, s_data_power):
+# organizing current, voltage values
+def organize_data_C_V(r_data_c_v):
     list_of_currents = []
     list_of_voltage = []
     count = 0
@@ -74,9 +69,18 @@ def compare_data(r_data_c_v, s_data_power):
         # goes to the next key in the dictionary
         temp[temp.index(test_key) + 1]
 
+    return freq_c, freq_v
+
+
+def organize_power(power_data):
     return 0
 
-# Make sure to change query to actual bucket name in InfluxDB
+
+def analyze_data(current_vals, voltage_vals):
+    return 0
+
+
+# Make sure to change query to actual information in InfluxDB
 data_set_1 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kKETqnt0Cjmprzl9-VT5EtXjAr8e3Ce3w78w==", "NCAT Senior Project 2", "SP2",
         query = 'from(bucket: "Real_Telemetry_c_v") \
         |> range(start: -10y) \
@@ -85,5 +89,7 @@ data_set_2 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kK
         query = 'from(bucket: "Simulated_Telemetry_p") \
         |> range(start: -10y) \
         |> filter(fn:(r) => r._measurement == "power")')
-compare_data(data_set_1, data_set_2)
+dict_c, dict_v = organize_data_C_V(data_set_1)
+organize_power(data_set_2)
+analyze_data(dict_c, dict_v)
 
