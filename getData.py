@@ -10,7 +10,7 @@ def retrieve_data(token, org, bucket, query):
         result = query_api.query(org=org, query=query)
         # List of each field and its value
         list_of_values = []
-        list_of_units = []
+        # list_of_units = []
 
         for table in result:
             for record in table.records:
@@ -19,9 +19,11 @@ def retrieve_data(token, org, bucket, query):
                     values = [record.get_field(), record.get_value(), record.get_time()]
                     # add list to running list of values
                     list_of_values.append(values)
+                    '''
                     # collecting all the units
                     unit = record.getUnits() # possibly update unit in powerpoint to _unit so we can pull units of measurement to implement in gui (possible drop down with all units of measurement and +, -, *, / to allow for external ingested equation
                     list_of_units.append(unit)
+                    '''
         return list_of_values
 
 
@@ -59,7 +61,7 @@ def compare_data(r_data_c_v, s_data_power):
     test_key = temp[0]
     for key, values in freq_c.items():
         # updates the dictionary to have the current of the satellite (all 8 solar panels) at a specific time
-        freq_c[key] = sum(values)
+        freq_c[key] = (sum(values)/8) # sum all values and divide by 8 to get the average current for satellite at each time
         # goes to the next key in the dictionary
         temp[temp.index(test_key) + 1]
 
@@ -68,7 +70,7 @@ def compare_data(r_data_c_v, s_data_power):
     test_key = temp[0]
     for key, values in freq_v.items():
         # updates the dictionary to have the voltage of the satellite (all 8 solar panels) at a specific time
-        freq_v[key] = sum(values)
+        freq_v[key] = (sum(values)/8) # sum all values and divide by 8 to get the average voltage for satellite at each time
         # goes to the next key in the dictionary
         temp[temp.index(test_key) + 1]
 
@@ -85,26 +87,3 @@ data_set_2 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kK
         |> filter(fn:(r) => r._measurement == "power")')
 compare_data(data_set_1, data_set_2)
 
-
-
-'''list_values1 = []
-list_values2 = []
-# list for storing the intensity of the deltas
-deltas = []
-
-
-# extracts the value (2nd element) from the tuple and stores it in list
-for x in r_data_c_v:
-    if(x[3])
-    value1 = x[1]
-    list_values1.append(value1)
-
-for y in s_data_power:
-    value2 = y[1]
-    list_values2.append(value2)
-
-# finds and stores just deltas in list
-zip_object = zip(list_values1, list_values2)
-for list1_v, list2_v in zip_object:
-    deltas.append(list1_v - list2_v)
-'''
