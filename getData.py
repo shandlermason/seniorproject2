@@ -109,7 +109,7 @@ def analyze_data(vals):
     upsampled = vals_df.set_index('New_Timestamp').resample('10S').mean()
     '''This draws a cubic plot between available data, in this case on the last of the month, and fills in values
     at the chosen frequency from this line.'''
-    interpolated = upsampled.interpolate(method='cubic')
+    interpolated = upsampled.interpolate(method='linear') # Do you think linear is best??
 
     # testing to see if the value makes sense/is correct
     # print(interpolated.loc['2018-06-15 02:16'])
@@ -135,3 +135,9 @@ dict_v = organize_data(v_list)
 inter_1 = analyze_data(dict_c)
 inter_2 = analyze_data(dict_v)
 inter_3 = analyze_data(dict_p)
+
+print(inter_1)
+print(inter_2)
+print(inter_3)
+
+# next step compare data at each time and find deltas then store and output to csv file
