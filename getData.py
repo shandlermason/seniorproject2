@@ -1,5 +1,5 @@
 from influxdb_client import InfluxDBClient
-
+import pandas as pd
 
 def retrieve_data(token, org, bucket, query):
     # Generated API token, org and bucket - ask Shandler for InfluxDB username and password
@@ -43,13 +43,13 @@ def organize_data_C_V(r_data_c_v):
         .setdefault() allows for multiple values to have the same key. The purpose of the dictionary is to sort 
         the field/value by there times. Sorting by the time will allows us to sum the current values 
         of all 8 solar panels on 1 satellite.'''
-        freq_c.setdefault((element[2].strftime("%m/%d/%Y, %H:%M:%S")), []).append(element[1])
+        freq_c.setdefault((element[2].strftime("%Y-%m-%d %H:%M:%S")), []).append(element[1])
     for element in list_of_voltage:
         '''Sets the default of the dictionary making the time the key value and the field/value the value. 
         .setdefault() allows for multiple values to have the same key. The purpose of the dictionary is to sort 
         the field/value by there times. Sorting by the time will allows us to sum the current values 
         of all 8 solar panels on 1 satellite.'''
-        freq_v.setdefault((element[2].strftime("%m/%d/%Y, %H:%M:%S")), []).append(element[1])
+        freq_v.setdefault((element[2].strftime("%Y-%m-%d %H:%M:%S")), []).append(element[1])
 
     # sum the current values of solar panels 1-8 with the same keys (the same times)
     temp = list(freq_c)
@@ -68,16 +68,28 @@ def organize_data_C_V(r_data_c_v):
         freq_v[key] = (sum(values)/8) # sum all values and divide by 8 to get the average voltage for satellite at each time
         # goes to the next key in the dictionary
         temp[temp.index(test_key) + 1]
-
     return freq_c, freq_v
 
 
 def organize_power(power_data):
     return 0
 
+# creates timestamp values for every 10 seconds and fills in with estimated values
+def analyze_data(vals):
+    vals_df = pd.DataFrame(vals.items(), columns=['Timestamp', 'Value'])
+    vals_df['New_Timestamp'] = pd.to_datetime(vals_df['Timestamp'].astype(str), format= '%Y%m%d %H:%M:%S')
+    '''Upsample the series into 10 S bins and average the values of the timestamps falling into a bin. 
+    The dataset has been upsampled with nan values for the remaining times except for those times which were 
+    originally available in our dataset.'''
+    upsampled = vals_df.set_index('New_Timestamp').resample('10S').mean()
+    '''This draws a cubic plot between available data, in this case on the last of the month, and fills in values
+    at the chosen frequency from this line.'''
+    interpolated = upsampled.interpolate(method='cubic')
 
-def analyze_data(current_vals, voltage_vals):
-    return 0
+    # testing to see if the value makes sense/is correct
+    # print(interpolated['2018-06-15 02:10'])
+
+    return interpolated
 
 
 # Make sure to change query to actual information in InfluxDB
@@ -90,6 +102,8 @@ data_set_2 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kK
         |> range(start: -10y) \
         |> filter(fn:(r) => r._measurement == "power")')
 dict_c, dict_v = organize_data_C_V(data_set_1)
-organize_power(data_set_2)
-analyze_data(dict_c, dict_v)
+dict_p = organize_power(data_set_2)
+analyze_data(dict_c)
+analyze_data(dict_v)
+analyze_data(dict_p)
 
