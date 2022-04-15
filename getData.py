@@ -117,6 +117,13 @@ def analyze_data(vals):
     return interpolated
 
 
+def find_deltas(current, voltage, power):
+    delta = 0
+    if current.get('New_Timestamp') == voltage.get('New_Timestamp') == power.get('New_Timestamp'):
+        delta = abs(power.get('Value') - (current.get('Value') * voltage.get('Value')))
+    return delta
+
+
 # Make sure to change query to actual information in InfluxDB
 data_set_1 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kKETqnt0Cjmprzl9-VT5EtXjAr8e3Ce3w78w==", "NCAT Senior Project 2", "SP2",
         query = 'from(bucket: "Real_Telemetry_c_v") \
@@ -132,12 +139,15 @@ dict_p = organize_power(data_set_2)
 dict_c = organize_data(c_list)
 dict_v = organize_data(v_list)
 
-inter_1 = analyze_data(dict_c)
-inter_2 = analyze_data(dict_v)
-inter_3 = analyze_data(dict_p)
+inter_c = analyze_data(dict_c)
+inter_v = analyze_data(dict_v)
+inter_p = analyze_data(dict_p)
 
-print(inter_1)
-print(inter_2)
-print(inter_3)
+
+list_of_deltas = find_deltas(inter_c, inter_v, inter_p)
+print(list_of_deltas)
+# print(inter_c)
+# print(inter_v)
+# print(inter_p)
 
 # next step compare data at each time and find deltas then store and output to csv file
