@@ -120,10 +120,23 @@ def analyze_data(vals):
 
 # find deltas by taking the absolute value of (power - (current*voltage))
 def find_deltas(current, voltage, power):
-    delta = 0
-    if current.get('New_Timestamp') == voltage.get('New_Timestamp') == power.get('New_Timestamp'):
-        delta = abs(power.get('Value') - (current.get('Value') * voltage.get('Value')))
-    return delta
+    count = 0
+    val_list = []
+
+    delta = abs(power.get('Value') - (current.get('Value') * voltage.get('Value')))
+
+    for x in range(len(delta.index)):
+        current_value = delta[count]
+        val_list.append(current_value)
+        count += 1
+
+    plt.scatter(delta.index, val_list)
+    plt.title("Delta Value vs. Time")
+    plt.xlabel("Time")
+    plt.ylabel("Delta Value")
+    plt.show()
+
+    return 0
 
 
 def create_output_c(data):
@@ -135,7 +148,6 @@ def create_output_c(data):
         count += 1
 
     current_time = data.filter(['New_Timestamp']) # or c.filter(['Value'][0])
-
 
     plt.scatter(current_time.index, val_list)
     plt.title("Current Value vs. Time")
@@ -175,30 +187,14 @@ def create_output_p(data):
 
     data_time = data.filter(['New_Timestamp']) # or data.filter(['Value'][0])
 
-
     plt.scatter(data_time.index, val_list)
     plt.title("Power Value vs. Time")
     plt.xlabel("Time")
     plt.ylabel("Power Value")
     plt.show()
 
-# ???
-def create_output_d(data):
-    count = 0
-    val_list = []
-    for x in range(len(data.index)):
-        data_value = data.get('Value')
-        val_list.append(data_value)
-        count += 1
+    return 0
 
-    data_time = data.filter(['New_Timestamp']) # or data.filter(['Value'][0])
-
-
-    plt.scatter(data_time.index, val_list)
-    plt.title("Deltas vs. Time")
-    plt.xlabel("Time")
-    plt.ylabel("Delta Value")
-    plt.show()
 
 # Make sure to change query to actual information in InfluxDB
 data_set_1 = retrieve_data("F9Mc-Unn4MGPfZIHb18W2a2FFOraMQzbqt_oQjZxlH79No3_v0kKETqnt0Cjmprzl9-VT5EtXjAr8e3Ce3w78w==", "NCAT Senior Project 2", "SP2",
@@ -224,12 +220,3 @@ list_of_deltas = find_deltas(inter_c, inter_v, inter_p)
 create_output_c(inter_c)
 create_output_v(inter_v)
 create_output_p(inter_p)
-create_output_d(list_of_deltas)
-
-# , inter_v, inter_p, list_of_deltas
-# print(list_of_deltas)
-# print(inter_c)
-# print(inter_v)
-# print(inter_p)
-
-# next step compare data at each time and find deltas then store and output to csv file
