@@ -2,6 +2,7 @@ from influxdb_client import InfluxDBClient
 import pandas as pd
 from numpy import mean
 import matplotlib.pyplot as plt
+import csv
 
 
 def retrieve_data(token, org, bucket, query):
@@ -136,6 +137,18 @@ def find_deltas(current, voltage, power):
     plt.ylabel("Delta Value")
     plt.show()
 
+    header = ['Timestamp', 'Intensity']
+    # open the file in the write mode
+    with open('deltas.csv', 'w') as csvfile:
+        # create the csv writer
+        writer = csv.writer(csvfile)
+
+        # write a row to the csv file
+        writer.writerow(header)
+
+        for count in range(len(val_list)):
+            writer.writerow([delta.index[count], val_list[count]])
+
     return 0
 
 
@@ -215,8 +228,9 @@ inter_c = analyze_data(dict_c)
 inter_v = analyze_data(dict_v)
 inter_p = analyze_data(dict_p)
 
-list_of_deltas = find_deltas(inter_c, inter_v, inter_p)
-
 create_output_c(inter_c)
 create_output_v(inter_v)
 create_output_p(inter_p)
+
+find_deltas(inter_c, inter_v, inter_p)
+
