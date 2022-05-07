@@ -27,7 +27,7 @@ Sorts through 2 different power fields. Determines max value between power body 
 Creates timestamp values for every 10 seconds and fills in with estimated values.
 <pre><code>def analyze_data(vals)</code></pre>
 
-Find deltas by taking the absolute value of (power - (current*voltage)). Outputs graph of Deltas vs. Timestamp and CSV file.
+Find deltas by taking the absolute value of (power - (current*voltage)). Outputs graph of Deltas vs. Timestamp and CSV file (deltas.csv).
 <pre><code>def find_deltas(current, voltage, power)</code></pre>
 
 Creates graphs for Current, Volatage, Power vs. Time
