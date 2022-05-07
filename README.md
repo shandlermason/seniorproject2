@@ -8,7 +8,7 @@ Advisor: Dr. Kelvin Bryant
 
 https://docs.influxdata.com/influxdb/v2.1/install/?t=Windows\
 
-3. All of the source code is in getData.py
+3. All of the source code is in file: getData.py
 4. Fill in token, org, bucket, query for method using appropriate credentials. <pre><code>def retrieve_data()</code> </pre> 
 5. You should now be able to retrieve data from InfluxDB
 
