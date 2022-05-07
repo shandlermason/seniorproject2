@@ -1,5 +1,6 @@
 # Team 6 - The Aerospace Team Senior Project 2
 Team Members: Shandler Mason, Timothy Bass, Brandez Tronshaw
+
 Advisor: Dr. Kelvin Bryant
 ## Product Installation/Set-Up Instructions
 1. Download and install InfluxDB for specific operating system 
